@@ -6,9 +6,14 @@ plugins {
     kotlin("jvm") version "1.8.0"
     kotlin("plugin.spring") version "1.8.0"
     kotlin("plugin.jpa") version "1.8.0"
+    kotlin("plugin.allopen") version "1.8.0"
     application
 }
-
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.Embeddable")
+    annotation("jakarta.persistence.MappedSuperclass")
+}
 group = "org.example"
 version = "1.0-SNAPSHOT"
 
@@ -22,7 +27,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
