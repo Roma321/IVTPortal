@@ -1,6 +1,5 @@
 package app
 
-import MyClass
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -10,8 +9,8 @@ class BlogApplication
 
 fun main(args: Array<String>) {
     runApplication<BlogApplication>(*args)
-    println("test")
-    val c = MyClass(3, 5)
-    println(c.sum)
+//    println("test")
+//    val c = MyClass(3, 5)
+//    println(c.sum)
 
 }
