@@ -43,6 +43,39 @@ public class Resit {
     )
     List<Group> groups;
 
+    @OneToOne
+    private Auditorium auditorium;
+
+    @OneToOne
+    private Teacher teacher;
+
+    @OneToOne
+    private Subject subject;
+
+    public Auditorium getAuditorium() {
+        return auditorium;
+    }
+
+    public void setAuditorium(Auditorium auditorium) {
+        this.auditorium = auditorium;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
     public Integer getComputerAmount() {
         return computerAmount;
     }

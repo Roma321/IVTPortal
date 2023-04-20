@@ -5,10 +5,17 @@ import jakarta.persistence.*;
 @Entity
 @Table
 public class Teacher {
+
+    public Teacher() {}
+
+    public Teacher(Integer teacherId) {
+        this.teacherId = teacherId;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "teacher_id")
-    private int teacherId;
+    private Integer teacherId;
 
     @Column(name = "first_name", length = 64)
     private String firstName;

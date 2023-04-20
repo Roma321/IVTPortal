@@ -6,6 +6,13 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table
 public class Auditorium {
+
+    public Auditorium() {}
+
+    public Auditorium(Integer auditoriumNumber) {
+        this.auditoriumNumber = auditoriumNumber;
+    }
+
     @Id
     @Column(name = "auditorium_id")
     private Integer auditoriumNumber;
