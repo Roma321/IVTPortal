@@ -22,7 +22,7 @@ public class ResitController {
         model.addAttribute("time", resit.getTimeStart().toLocalTime());
         model.addAttribute("isOnline", resit.getOnline() ? "Онлайн" : "В корпусе");
 
-        return "resit";
+        return "resit/resit";
     }
 
     @DeleteMapping("/resit/delete/{id}")
@@ -33,7 +33,7 @@ public class ResitController {
         model.addAttribute("time", "Удалено");
         model.addAttribute("isOnline", "Удалено");
 
-        return "resit";
+        return "resit/resit";
     }
 
     @GetMapping("/resit/all")
