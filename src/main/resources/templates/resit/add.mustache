@@ -29,10 +29,11 @@
         <input type="time" id="timeDuration" name="timeDuration"/>
     </p>
     <p>
-        <label for="teacher">Преподаватель: </label>
-        <label>
-            <select>
-               <!--            добавить преподавателей-->
+        <label for="teacherId">Преподаватель:</label>
+            <select type="number" id="teacherId" name="teacherId">
+            {{#teachers}}
+               <option>{{lastName}} {{firstName}} {{patronymic}}</option>
+            {{/teachers}}
             </select>
         </label>
     </p>
