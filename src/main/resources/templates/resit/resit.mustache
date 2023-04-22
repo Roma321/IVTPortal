@@ -1,13 +1,57 @@
-{{> header}}
+<html>
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
 
-<div>
-    {{date}}
-</div>
-<div>
-    {{time}}
-</div>
-<div>
-    {{isOnline}}
-</div>
-
-{{> footer}}
+        table, td, th {
+            border: 1px solid #999;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+<h2>Пересдачи</h2>
+<form action="/resit/add" method="GET">
+    <input type="submit" value="Добавить" />
+</form>
+<table>
+    <tr>
+        <th>Дата проведения</th>
+        <th>Предмет</th>
+        <th>Преподаватель</th>
+        <th>Аудитория</th>
+        <th>Время начала</th>
+        <th>Длительность</th>
+        <th>Формат проведения</th>
+        <th>Число пересдающих</th>
+        <th>Требуется компьютеров</th>
+        <th></th>
+    </tr>
+    {{#resits}}
+        <tr>
+            <td>{{date}}</td>
+            <td>{{#getSubject}}{{subjectName}}{{/getSubject}}</td>
+            <td>{{#getTeacher}}{{lastName}} {{firstName}} {{patronymic}}{{/getTeacher}}</td>
+            <td>{{#getAuditorium}}{{auditoriumNumber}}{{/getAuditorium}}</td>
+            <td>{{timeStart}}</td>
+            <td>{{timeDuration}}</td>
+            {{#isOnline}}
+            <td>Онлайн</td>
+            {{/isOnline}}
+            {{^isOnline}}
+            <td>Очно</td>
+            {{/isOnline}}
+            <td>{{peopleAmount}}</td>
+            <td>{{computerAmount}}</td>
+            <td>
+                <form action="/resit/delete/{{resitId}}" method="POST">
+                <input type="submit" value="Удалить" />
+                </form>
+            </td>
+        </tr>
+    {{/resits}}
+</table>
+</body>
+</html>
