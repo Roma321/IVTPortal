@@ -1,5 +1,9 @@
 package app.services.lessonschedule;
 
-public interface LessonScheduleService {
+import app.models.LessonSchedule;
 
+public interface LessonScheduleService {
+    LessonSchedule addLessonSchedule(LessonSchedule lessonSchedule);
+    void deleteAuditorium(Integer id);
+    Iterable<LessonSchedule> getAll();
 }

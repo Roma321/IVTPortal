@@ -1,10 +1,11 @@
 package app.services.teacher;
 
 import app.models.Teacher;
-import app.repositories.ResitRepository;
 import app.repositories.TeacherRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TeacherServiceImpl implements TeacherService{
 
     private final TeacherRepository repository;
@@ -19,9 +20,7 @@ public class TeacherServiceImpl implements TeacherService{
 
     @Override
     @Transactional
-    public void deleteTeacher(Integer id) {
-           this.repository.deleteById(id);
-    }
+    public void deleteTeacher(Integer id) { this.repository.deleteById(id);}
 
     @Override
     public Iterable<Teacher> getAll() {

@@ -1,6 +1,7 @@
 package app.services.lessonschedule;
 
 
+import app.models.LessonSchedule;
 import app.repositories.LessonScheduleRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,4 +14,18 @@ public class LessonScheduleServiceImpl implements LessonScheduleService {
     }
 
 
+    @Override
+    public LessonSchedule addLessonSchedule(LessonSchedule lessonSchedule) {
+        return this.repository.save(lessonSchedule);
+    }
+
+    @Override
+    public void deleteAuditorium(Integer id) {
+           this.repository.deleteById(id);
+    }
+
+    @Override
+    public Iterable<LessonSchedule> getAll() {
+        return repository.findAll();
+    }
 }
