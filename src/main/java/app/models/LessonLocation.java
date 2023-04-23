@@ -26,7 +26,7 @@ public class LessonLocation {
     @Column(name = "lesson_location_id")
     private Integer lessonLocationId;
 
-    @Column(name = "lesson_location.mustache", length = 64, unique = true)
+    @Column(name = "lesson_location", length = 64, unique = true)
     private String lessonLocation;
 
     public Integer getLessonLocationId() {

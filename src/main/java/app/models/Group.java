@@ -28,6 +28,9 @@ public class Group {
     @Enumerated(EnumType.STRING)
     private GroupType groupType;
 
+    @Column(name = "people_amount", nullable = false)
+    private Integer peopleAmount;
+
     public Integer getGroupId() {
         return groupId;
     }
@@ -58,5 +61,13 @@ public class Group {
 
     public void setGroupType(GroupType groupType) {
         this.groupType = groupType;
+    }
+
+    public Integer getPeopleAmount() {
+        return peopleAmount;
+    }
+
+    public void setPeopleAmount(Integer peopleAmount) {
+        this.peopleAmount = peopleAmount;
     }
 }
