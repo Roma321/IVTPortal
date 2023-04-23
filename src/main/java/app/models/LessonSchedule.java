@@ -138,4 +138,21 @@ public class LessonSchedule {
     public void setGroups(List<Group> groups) {
         this.groups = groups;
     }
+
+    @Override
+    public String toString() {
+        return "LessonSchedule{" +
+                "lessonId=" + lessonId +
+                ", isOnline=" + isOnline +
+                ", weekDay=" + weekDay +
+                ", lessonNumber=" + lessonNumber +
+                ", lessonType=" + lessonType +
+                ", lessonLocation='" + lessonLocation + '\'' +
+                ", dateCreated=" + dateCreated +
+                ", teacher=" + teacher +
+                ", subject=" + subject +
+                ", auditorium=" + auditorium +
+                ", groups=" + groups +
+                '}';
+    }
 }

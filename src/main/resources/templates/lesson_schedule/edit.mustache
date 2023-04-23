@@ -1,0 +1,66 @@
+<h1>Группа {{group}}:</h1>
+<form method="post">
+
+    <div>
+        День недели:
+        <select name="dayOfTheWeek">
+            <option value="monday">Понедельник</option>
+            <option value="tuesday">Вторник</option>
+            <option value="wednesday">Среда</option>
+            <option value="thursday">Четверг</option>
+            <option value="friday">Пятница</option>
+            <option value="saturday">Суббота</option>
+        </select>
+    </div>
+    <div>
+        Номер пары:
+        <select name="lessonNumber">
+            <option value=1>1</option>
+            <option value=2>2</option>
+            <option value=3>3</option>
+            <option value=4>4</option>
+            <option value=5>5</option>
+        </select>
+    </div>
+    <div>
+        Преподаватель:
+        <select name="teacherId">
+            {{#teachers}}
+                <option value={{id}}>{{fullName}}</option>
+            {{/teachers}}
+        </select>
+    </div>
+    <div>
+        Регулярность проведения:
+        <select name="regularity">
+            <option value="chis_and_znam">Еженедельно</option>
+            <option value="chis">По числителям</option>
+            <option value="znam">По знаменателям</option>
+        </select>
+    </div>
+    <div>
+        Учебный предмет:
+        <select name="subjectId">
+            {{#subjects}}
+                <option value={{subjectId}}>{{subjectName}}</option>
+            {{/subjects}}
+        </select>
+    </div>
+    <div>
+        Проводится онлайн <input type="checkbox" name="isOnline">
+    </div>
+    <div>
+        Аудитория:
+        <select name="auditorium">
+            {{#auditoriums}}
+                <option value={{auditoriumNumber}}>{{auditoriumNumber}}</option>
+            {{/auditoriums}}
+        </select>
+    </div>
+    <div>
+        <button type="submit">Добавить</button>
+    </div>
+</form>
+<script>
+    console.log(JSON.parse("{{subjects_json}}".replaceAll("&quot;",'"')))
+</script>

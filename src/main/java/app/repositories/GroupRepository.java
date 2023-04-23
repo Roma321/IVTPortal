@@ -5,4 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface GroupRepository extends CrudRepository<Group, Integer> {
     void deleteGroupByGroupName(String groupName);
+
+    Group findGroupByGroupName(String groupName);
+
 }
