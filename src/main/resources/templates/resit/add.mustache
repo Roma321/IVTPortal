@@ -8,6 +8,7 @@
     <style id="main-form-style">
         div {text-align: center;}
         p {text-align: left}
+        a {text-align: left}
     </style>
 </head>
 <body>
@@ -32,30 +33,35 @@
         <label for="teacherId">Преподаватель:</label>
             <select type="number" id="teacherId" name="teacherId">
             {{#teachers}}
-               <option>{{lastName}} {{firstName}} {{patronymic}}</option>
+               <option value="{{teacherId}}">{{lastName}} {{firstName}} {{patronymic}}</option>
             {{/teachers}}
             </select>
         </label>
     </p>
     <p>
-        <label for="auditories">Аудитории: </label>
-        <label>
-            <select>
-                <!--            добавить аудитории-->
+        <label for="auditoriumNumber">Аудитория:</label>
+            <select type="number" id="auditoriumNumber" name="auditoriumNumber">
+                {{#auditoriums}}
+                    <option value="{{auditoriumNumber}}">{{auditoriumNumber}}</option>
+                {{/auditoriums}}
             </select>
         </label>
     </p>
     <p>
-        <label for="subjects">Предмет: </label>
-        <label>
-            <select>
-                <!--            добавить предметы-->
+        <label for="subjectId">Предмет:</label>
+            <select type="number" id="subjectId" name="subjectId">
+                {{#subjects}}
+                    <option value="{{subjectId}}">{{subjectName}}</option>
+                {{/subjects}}
             </select>
         </label>
     </p>
     <p>
         <label for="isOnline">Онлайн: </label>
-        <input type="checkbox" id="isOnline" name="isOnline">
+        <select type="boolean" id="isOnline" name="isOnline">
+                <option value="false">Очно</option>
+                <option value="true">Онлайн</option>
+        </select>
     </p>
     <p>
         <label for="peopleAmount">Количество студентов: </label>
@@ -68,6 +74,7 @@
     <p>
         <button type="submit">Добавить</button>
     </p>
+    <a href="/resit/all">Назад</a>
 </form>
 </div>
 </div>

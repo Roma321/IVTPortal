@@ -24,7 +24,14 @@ public class AuditoriumServiceImpl implements AuditoriumService {
     }
 
     @Override
+    public Auditorium getById(Integer id) {
+       return repository.findById(id).orElseThrow();
+    }
+
+    @Override
     public Iterable<Auditorium> getAll() {
         return repository.findAll();
     }
+
+
 }
