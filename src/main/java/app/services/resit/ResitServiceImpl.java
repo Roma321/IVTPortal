@@ -28,6 +28,16 @@ public class ResitServiceImpl implements ResitService {
     }
 
     @Override
+    public void updateResit(Resit resit) {
+        repository.save(resit);
+    }
+
+    @Override
+    public Resit getById(Integer id) {
+        return repository.findById(id).orElseThrow();
+    }
+
+    @Override
     public Iterable<Resit> getAll() {
         return repository.findAll();
     }
