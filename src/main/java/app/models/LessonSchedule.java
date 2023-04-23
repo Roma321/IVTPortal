@@ -46,7 +46,7 @@ public class LessonSchedule {
     @OneToOne(fetch = FetchType.EAGER)
     private Auditorium auditorium;
 
-    @OneToMany
+    @ManyToMany
     private List<Group> groups;
 
     public Integer getLessonId() {

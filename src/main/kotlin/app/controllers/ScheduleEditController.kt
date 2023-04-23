@@ -64,7 +64,14 @@ class ScheduleEditController {
         @RequestParam dayOfTheWeek: String?,
         model: Model
     ): String {
-        if (auditorium != null && teacherId != null && isOnline != null && lessonNumber != null && regularity != null && subjectId != null && auditorium != null && dayOfTheWeek != null) {
+        println(teacherId)
+        println(isOnline)
+        println(lessonNumber)
+        println(regularity)
+        println(subjectId)
+        println(auditorium)
+        println(dayOfTheWeek)
+        if (auditorium != null && teacherId != null && lessonNumber != null && regularity != null && subjectId != null && auditorium != null && dayOfTheWeek != null) {
             val newLesson = LessonSchedule()
             val lessonType = getLessonType(regularity)
             val teacher = teacherRepository.findById(teacherId).get()
@@ -73,7 +80,7 @@ class ScheduleEditController {
             newLesson.lessonLocation = "7 корпус"
 
             newLesson.teacher = teacher
-            newLesson.online = isOnline
+            newLesson.online = isOnline ?: false //по умолчанию приходит null
 
             newLesson.lessonType = lessonType
             newLesson.subject = subjectRepository.findById(subjectId).get()
@@ -89,20 +96,14 @@ class ScheduleEditController {
                     lessonType
                 )
             val currentGroup = groupRepository.findById(groupId).get()
-            if (sameLesson!=null){
-                sameLesson.groups = sameLesson.groups.plus(currentGroup)
+            if (sameLesson != null) {
+                if (currentGroup.groupId !in sameLesson.groups.map { it.groupId })
+                    sameLesson.groups = sameLesson.groups.plus(currentGroup)
                 lessonScheduleRepository.save(sameLesson)
-            } else{
+            } else {
                 newLesson.groups = listOf(currentGroup)
                 lessonScheduleRepository.save(newLesson)
             }
-//            val saved = sameLesson ?: lessonScheduleRepository.save(newLesson)
-//            println(sameLesson)
-//            println(saved)
-//            lessonScheduleRepository.save(newLesson)
-//            if (sameLesson.get()!=null
-//            )
-//                lessonScheduleRepository.addLessonSchedule(newLesson)
         }
 
         fillModelDefaultData(model, groupId)

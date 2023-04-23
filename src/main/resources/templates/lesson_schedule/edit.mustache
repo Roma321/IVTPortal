@@ -4,7 +4,7 @@
     <div>
         День недели:
         <select name="dayOfTheWeek">
-            <option value="monday">Понедельник</option>
+            <option value="monday" selected="selected">Понедельник</option>
             <option value="tuesday">Вторник</option>
             <option value="wednesday">Среда</option>
             <option value="thursday">Четверг</option>
@@ -33,7 +33,7 @@
     <div>
         Регулярность проведения:
         <select name="regularity">
-            <option value="chis_and_znam">Еженедельно</option>
+            <option value="chis_and_znam" selected="selected">Еженедельно</option>
             <option value="chis">По числителям</option>
             <option value="znam">По знаменателям</option>
         </select>
@@ -47,7 +47,7 @@
         </select>
     </div>
     <div>
-        Проводится онлайн <input type="checkbox" name="isOnline">
+        Проводится онлайн <input type="checkbox" name="isOnline" checked="checked">
     </div>
     <div>
         Аудитория:
@@ -63,4 +63,6 @@
 </form>
 <script>
     console.log(JSON.parse("{{subjects_json}}".replaceAll("&quot;",'"')))
+
+
 </script>
