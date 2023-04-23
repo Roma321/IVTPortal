@@ -23,6 +23,11 @@ public class TeacherServiceImpl implements TeacherService{
     public void deleteTeacher(Integer id) { this.repository.deleteById(id);}
 
     @Override
+    public Teacher getById(Integer id) {
+        return repository.findById(id).orElseThrow();
+    }
+
+    @Override
     public Iterable<Teacher> getAll() {
         return this.repository.findAll();
     }

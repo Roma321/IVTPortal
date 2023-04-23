@@ -1,43 +1,124 @@
 package app.controllers;
 
+import app.models.Auditorium;
 import app.models.Resit;
+import app.models.Subject;
+import app.models.Teacher;
+import app.services.auditorium.AuditoriumService;
 import app.services.resit.ResitService;
+import app.services.subject.SubjectService;
+import app.services.teacher.TeacherService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 
 @Controller
 public class ResitController {
     private final ResitService resitService;
+    private final TeacherService teacherService;
+    private final SubjectService subjectService;
+    private final AuditoriumService auditoriumService;
 
-    public ResitController(ResitService resitService) {
+    @Autowired
+    public ResitController(ResitService resitService, TeacherService teacherService, SubjectService subjectService, AuditoriumService auditoriumService) {
         this.resitService = resitService;
+        this.teacherService = teacherService;
+        this.subjectService = subjectService;
+        this.auditoriumService = auditoriumService;
     }
-
     @PostMapping("/resit/add")
-    public String addResit(Model model, @RequestBody Resit resit) {
-        resitService.addResit(resit);
+    public String addResit(@RequestParam (value = "resitId", required = false) Integer id,
+                           @RequestParam (value = "date", required = false)
+                           @DateTimeFormat(pattern = "yyyy-MM-dd")
+                               LocalDate date,
+                           @RequestParam (value = "timeStart", required = false)
+                           @DateTimeFormat(pattern = "hh:mm:ss")
+                               LocalTime timeStart,
+                           @RequestParam (value = "timeDuration", required = false)
+                           @DateTimeFormat(pattern = "hh:mm:ss")
+                               LocalTime timeDuration,
+                           @RequestParam (value = "teacherId", required = false)
+                               Integer teacherId,
+                           @RequestParam (value = "auditoriumNumber", required = false)
+                               Integer auditoriumNumber,
+                           @RequestParam (value = "subjectId", required = false)
+                               Integer subjectId,
+                           @RequestParam (value = "isOnline", required = false)
+                               Boolean isOnline,
+                           @RequestParam (value = "peopleAmount", required = false)
+                               Integer peopleAmount,
+                           @RequestParam (value = "computerAmount", required = false)
+                               Integer computerAmount
+                           ) {
 
-        model.addAttribute("date", resit.getDate().toLocalDate());
-        model.addAttribute("time", resit.getTimeStart().toLocalTime());
-        model.addAttribute("isOnline", resit.getOnline() ? "Онлайн" : "В корпусе");
-
-        return "resit/resit";
+        Resit resit = id == null ? new Resit() : resitService.getById(id);
+        Teacher resitTeacher = teacherService.getById(teacherId);
+        Auditorium resitAuditorium = auditoriumService.getById(auditoriumNumber);
+        Subject resitSubject = subjectService.getById(subjectId);
+        resit.setDate(date == null ? null : Date.valueOf(date));
+        resit.setTimeStart(timeStart == null ? null : Time.valueOf(timeStart));
+        resit.setTimeDuration(timeDuration == null ? null : Time.valueOf(timeDuration));
+        resit.setTeacher(resitTeacher);
+        resit.setAuditorium(resitAuditorium);
+        resit.setSubject(resitSubject);
+        resit.setOnline(isOnline);
+        resit.setPeopleAmount(peopleAmount);
+        resit.setComputerAmount(computerAmount);
+        if (id == null) {
+            resitService.addResit(resit);
+        } else {
+            resitService.updateResit(resit);
+        }
+        return "redirect:/resit/all";
     }
-
-    @DeleteMapping("/resit/delete/{id}")
-    public String deleteResit(Model model, @PathVariable Integer id) {
+    @GetMapping("/resit/add")
+    public String addResit(Model model) {
+        Iterable<Teacher> teachers = teacherService.getAll();
+        model.addAttribute("teachers", teachers);
+        Iterable<Subject> subjects = subjectService.getAll();
+        model.addAttribute("subjects", subjects);
+        Iterable<Auditorium> auditoriums = auditoriumService.getAll();
+        model.addAttribute("auditoriums", auditoriums);
+        return "resit/add";
+    }
+    @PostMapping("/resit/delete/{id}")
+    public String deleteResit(@PathVariable Integer id) {
         resitService.deleteResit(id);
-
-        model.addAttribute("date", "Удалено");
-        model.addAttribute("time", "Удалено");
-        model.addAttribute("isOnline", "Удалено");
-
-        return "resit/resit";
+        return "redirect:/resit/all";
     }
 
     @GetMapping("/resit/all")
-    public Iterable<Resit> getAll(Model model) {
-        return resitService.getAll();
+    public String getAll(Model model) {
+        Iterable<Resit> resits = resitService.getAll();
+        model.addAttribute("resits", resits);
+        return "resit/resit";
     }
+    @GetMapping("/resit/edit/{id}")
+    public String editResit(Model model, @PathVariable Integer id) {
+        Iterable<Teacher> teachers = teacherService.getAll();
+        model.addAttribute("teachers", teachers);
+        Iterable<Subject> subjects = subjectService.getAll();
+        model.addAttribute("subjects", subjects);
+        Iterable<Auditorium> auditoriums = auditoriumService.getAll();
+        model.addAttribute("auditoriums", auditoriums);
+        Resit resit = resitService.getById(id);
+        model.addAttribute("resit", resit);
+        Teacher teacher = resit.getTeacher();
+        Auditorium auditorium = resit.getAuditorium();
+        Subject subject = resit.getSubject();
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("auditorium", auditorium);
+        model.addAttribute("subject", subject);
+        return "resit/edit";
+    }
+
 }
