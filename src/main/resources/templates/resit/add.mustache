@@ -1,0 +1,82 @@
+<html>
+<head>
+    <style id="main-style">
+        h2 {text-align: center;}
+        p {text-align: center;}
+        div {text-align: center; margin-left: 300px; margin-right: 300px}
+    </style>
+    <style id="main-form-style">
+        div {text-align: center;}
+        p {text-align: left}
+        a {text-align: left}
+    </style>
+</head>
+<body>
+<h2>Добавление пересдачи</h2>
+<body>
+<div id="main-style">
+<div id="main-form-style">
+<form action="/resit/add" method="POST">
+    <p>
+        <label for="date">Дата проведения: </label>
+        <input type="date" id="date" name="date"/>
+    </p>
+    <p>
+        <label for="timeStart">Время начала: </label>
+        <input type="time" id="timeStart" name="timeStart"/>
+    </p>
+    <p>
+        <label for="timeDuration">Длителность: </label>
+        <input type="time" id="timeDuration" name="timeDuration"/>
+    </p>
+    <p>
+        <label for="teacherId">Преподаватель:</label>
+            <select type="number" id="teacherId" name="teacherId">
+            {{#teachers}}
+               <option value="{{teacherId}}">{{lastName}} {{firstName}} {{patronymic}}</option>
+            {{/teachers}}
+            </select>
+        </label>
+    </p>
+    <p>
+        <label for="auditoriumNumber">Аудитория:</label>
+            <select type="number" id="auditoriumNumber" name="auditoriumNumber">
+                {{#auditoriums}}
+                    <option value="{{auditoriumNumber}}">{{auditoriumNumber}}</option>
+                {{/auditoriums}}
+            </select>
+        </label>
+    </p>
+    <p>
+        <label for="subjectId">Предмет:</label>
+            <select type="number" id="subjectId" name="subjectId">
+                {{#subjects}}
+                    <option value="{{subjectId}}">{{subjectName}}</option>
+                {{/subjects}}
+            </select>
+        </label>
+    </p>
+    <p>
+        <label for="isOnline">Онлайн: </label>
+        <select type="boolean" id="isOnline" name="isOnline">
+                <option value="false">Очно</option>
+                <option value="true">Онлайн</option>
+        </select>
+    </p>
+    <p>
+        <label for="peopleAmount">Количество студентов: </label>
+        <input type="number" id="peopleAmount" name="peopleAmount"/>
+    </p>
+    <p>
+        <label for="computerAmount">Требуется компьютеров: </label>
+        <input type="number" id="computerAmount" name="computerAmount"/>
+    </p>
+    <p>
+        <button type="submit">Добавить</button>
+    </p>
+    <a href="/resit/all">Назад</a>
+</form>
+</div>
+</div>
+</body>
+

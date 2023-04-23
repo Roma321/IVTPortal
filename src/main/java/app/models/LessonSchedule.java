@@ -30,11 +30,11 @@ public class LessonSchedule {
     @Enumerated(EnumType.STRING)
     private LessonType lessonType;
 
-    @Column(name = "lesson_location", length = 64, nullable = false)
-    private String lessonLocation;
-
     @Column(name = "date_created", nullable = false)
     private java.sql.Date dateCreated;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private LessonLocation lessonLocation;
 
     @OneToOne(fetch = FetchType.EAGER)
     private Teacher teacher;
@@ -91,11 +91,11 @@ public class LessonSchedule {
         this.lessonType = lessonType;
     }
 
-    public String getLessonLocation() {
+    public LessonLocation getLessonLocation() {
         return lessonLocation;
     }
 
-    public void setLessonLocation(String lessonLocation) {
+    public void setLessonLocation(LessonLocation lessonLocation) {
         this.lessonLocation = lessonLocation;
     }
 

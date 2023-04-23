@@ -25,6 +25,11 @@ public class LessonScheduleServiceImpl implements LessonScheduleService {
     }
 
     @Override
+    public LessonSchedule getById(Integer id) {
+        return this.repository.findById(id).orElseThrow();
+    }
+
+    @Override
     public Iterable<LessonSchedule> getAll() {
         return repository.findAll();
     }

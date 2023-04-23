@@ -23,6 +23,11 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    public Subject getById(Integer id) {
+        return repository.findById(id).orElseThrow();
+    }
+
+    @Override
     public Iterable<Subject> getAll() {
         return repository.findAll();
     }
