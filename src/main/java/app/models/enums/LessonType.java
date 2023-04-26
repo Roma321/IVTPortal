@@ -4,7 +4,7 @@ public enum LessonType {
     // числитель
     NUMERATOR,
     // знаменатель
-    DENUMERATOR,
+    DENOMINATOR,
     // оба
     ALL
 }

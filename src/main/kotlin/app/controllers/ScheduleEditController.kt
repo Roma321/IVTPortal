@@ -5,6 +5,7 @@ import app.models.Teacher
 import app.models.enums.LessonType
 import app.models.enums.WeekDay
 import app.repositories.*
+import app.util.getTeacherFullName
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -49,20 +50,27 @@ class ScheduleEditController {
         val group = groupRepository.findById(groupId).get()
         val currentSchedule = lessonScheduleRepository.findLessonSchedulesByGroupsGroupId(groupId)
         val fullSchedule = lessonScheduleRepository.findAll().toList()
-        println(currentSchedule.size)
+        val displaySchedule = currentSchedule.groupBy { it.weekDay }.mapValues { groupedByDay ->
+            groupedByDay.value.groupBy { it.lessonNumber }
+                .mapValues { groupedByNumber -> groupedByNumber.value.map { LessonItem(it) } }
+        }
+//        val displaySchedule = currentSchedule.map {
+//            LessonItem(it)
+//        }
+        println(displaySchedule)
+        model["displaySchedule"] = mapper.writeValueAsString(displaySchedule)
         println("--------------------------------")
         val busynessInfo =
             getBusinessInfo(currentSchedule, fullSchedule)
-        println(busynessInfo)
+//        println(busynessInfo)
         model["busynessInfo"] = mapper.writeValueAsString(busynessInfo)
         model["daysOfWeek"] = WeekDay.values().map { mapOf("value" to it, "name" to it.toRussianName()) }
         model["group"] = group.groupName
         model["locations"] = lessonLocationRepository.findAll()
         model["subjects"] = subjectRepository.findAll()
         val teachers = teacherRepository.findAll()
-            .map { mapOf("id" to it.teacherId, "fullName" to "${it.lastName} ${it.firstName} ${it.patronymic}") }
+            .map { mapOf("id" to it.teacherId, "fullName" to getTeacherFullName(it)) }
         model["teachers"] = mapper.writeValueAsString(teachers)
-        println(teachers)
         model["auditoriums"] = mapper.writeValueAsString(
             auditoriumRepository.findAll()
                 .filter { it.placeAmount >= group.peopleAmount })
@@ -73,11 +81,10 @@ class ScheduleEditController {
         fullSchedule: List<LessonSchedule>
     ): MutableMap<WeekDay, Map<String, Any>> {
         val groupedGroupSchedule = currentSchedule.groupBy { it.weekDay }
-        println(groupedGroupSchedule)
         val groupedFullSchedule = fullSchedule.groupBy { it.weekDay }
         val weeksForDenominator = listOf(
             LessonType.ALL,
-            LessonType.DENUMERATOR
+            LessonType.DENOMINATOR
         )
         val weeksForNumerator = listOf(
             LessonType.ALL,
@@ -223,14 +230,13 @@ class ScheduleEditController {
 
         newLesson.weekDay = weekDay
         newLesson.dateCreated = Date(System.currentTimeMillis())
-        println(newLesson)
         return newLesson
     }
 
     private fun getLessonType(regularity: String): LessonType {
         return when (regularity) {
             "chis" -> LessonType.NUMERATOR
-            "znam" -> LessonType.DENUMERATOR
+            "znam" -> LessonType.DENOMINATOR
             "chis_and_znam" -> LessonType.ALL
             else -> throw IllegalAccessException("Wrong regularity")
         }
@@ -238,3 +244,22 @@ class ScheduleEditController {
 }
 
 data class PairInfo(val busyTeachers: List<Int>, val busyAuditoriums: List<Int>)
+data class LessonItem(
+    val name: String,
+    val regularity: LessonType,
+    val teacher: String,
+    val auditorium: Int,
+    val isOnline: Boolean,
+    val location: String,
+) {
+    constructor(it: LessonSchedule) : this(
+        name = it.subject.subjectName,
+        auditorium = it.auditorium.auditoriumNumber,
+        isOnline = it.online,
+        location = it.lessonLocation.lessonLocation,
+        regularity = it.lessonType,
+        teacher = getTeacherFullName(it.teacher)
+    ) {
+
+    }
+}
