@@ -1,6 +1,7 @@
 package app.controllers
 
 import app.models.LessonSchedule
+import app.models.Teacher
 import app.models.enums.LessonType
 import app.models.enums.WeekDay
 import app.repositories.*
@@ -35,6 +36,9 @@ class ScheduleEditController {
     @Autowired
     lateinit var auditoriumRepository: AuditoriumRepository
 
+    @Autowired
+    lateinit var lessonLocationRepository: LessonLocationRepository
+
     @GetMapping("/schedule/edit/{groupId}")
     fun showEditorWithSchedule(model: Model, @PathVariable groupId: Int): String {
         fillModelDefaultData(model, groupId)
@@ -42,15 +46,98 @@ class ScheduleEditController {
     }
 
     private fun fillModelDefaultData(model: Model, groupId: Int) {
-        model["group"] = groupRepository.findById(groupId).get().groupName
-        val a = subjectRepository.findAll().toList()
-        model["subjects"] = a
-        println(mapper.writeValueAsString(a))
-        model["subjects_json"] = mapper.writeValueAsString(a)
-        model["teachers"] = teacherRepository.findAll()
+        val group = groupRepository.findById(groupId).get()
+        val currentSchedule = lessonScheduleRepository.findLessonSchedulesByGroupsGroupId(groupId)
+        val fullSchedule = lessonScheduleRepository.findAll().toList()
+        println(currentSchedule.size)
+        println("--------------------------------")
+        val busynessInfo =
+            getBusinessInfo(currentSchedule, fullSchedule)
+        println(busynessInfo)
+        model["busynessInfo"] = mapper.writeValueAsString(busynessInfo)
+        model["daysOfWeek"] = WeekDay.values().map { mapOf("value" to it, "name" to it.toRussianName()) }
+        model["group"] = group.groupName
+        model["locations"] = lessonLocationRepository.findAll()
+        model["subjects"] = subjectRepository.findAll()
+        val teachers = teacherRepository.findAll()
             .map { mapOf("id" to it.teacherId, "fullName" to "${it.lastName} ${it.firstName} ${it.patronymic}") }
-        model["auditoriums"] = auditoriumRepository.findAll()
+        model["teachers"] = mapper.writeValueAsString(teachers)
+        println(teachers)
+        model["auditoriums"] = mapper.writeValueAsString(
+            auditoriumRepository.findAll()
+                .filter { it.placeAmount >= group.peopleAmount })
     }
+
+    private fun getBusinessInfo(
+        currentSchedule: MutableList<LessonSchedule>,
+        fullSchedule: List<LessonSchedule>
+    ): MutableMap<WeekDay, Map<String, Any>> {
+        val groupedGroupSchedule = currentSchedule.groupBy { it.weekDay }
+        println(groupedGroupSchedule)
+        val groupedFullSchedule = fullSchedule.groupBy { it.weekDay }
+        val weeksForDenominator = listOf(
+            LessonType.ALL,
+            LessonType.DENUMERATOR
+        )
+        val weeksForNumerator = listOf(
+            LessonType.ALL,
+            LessonType.NUMERATOR
+        )
+        val t = WeekDay.values()
+            .map { weekDay ->
+                mapOf(
+                    weekDay to mapOf(
+                        "name" to weekDay.toRussianName(),
+                        "positionInWeek" to weekDay.ordinal,
+                        "chis" to getFreePairs(
+                            excludePairs = groupedGroupSchedule[weekDay]?.filter { it.lessonType in weeksForNumerator }
+                                ?.map { lesson -> lesson.lessonNumber } ?: listOf(),
+                            weeksLooking = weeksForNumerator,
+                            fullSchedule = groupedFullSchedule[weekDay] ?: listOf()
+                        ),
+                        "znam" to getFreePairs(
+                            excludePairs = groupedGroupSchedule[weekDay]?.filter { it.lessonType in weeksForDenominator }
+                                ?.map { lesson -> lesson.lessonNumber } ?: listOf(),
+                            weeksLooking = weeksForDenominator,
+                            fullSchedule = groupedFullSchedule[weekDay] ?: listOf()
+                        ),
+                        "chis_and_znam" to getFreePairs(
+                            excludePairs = groupedGroupSchedule[weekDay]?.map { lesson -> lesson.lessonNumber }
+                                ?: listOf(),
+                            weeksLooking = LessonType.values().toList(),
+                            fullSchedule = groupedFullSchedule[weekDay] ?: listOf()
+                        ),
+                    )
+                )
+            }
+        val res = mutableMapOf<WeekDay, Map<String, Any>>()
+        for (el in WeekDay.values()) {
+            val d = t.find { it.keys.contains(el) }!!.values.toList()[0]
+            res[el] = d
+        }
+        return res
+    }
+
+    private fun getFreePairs(
+        excludePairs: List<Int>,
+        weeksLooking: List<LessonType>,
+        fullSchedule: List<LessonSchedule>
+    ): MutableMap<Int, PairInfo> {
+        val groupedByLessonNumber = fullSchedule.filter {
+            it.lessonType in weeksLooking && it.lessonNumber !in excludePairs
+        }.groupBy { it.lessonNumber }.mapValues { entry ->
+            PairInfo(
+                busyAuditoriums = entry.value.map { it.auditorium.auditoriumNumber },
+                busyTeachers = entry.value.map { it.teacher.teacherId })
+        }.toMutableMap()
+
+        for (key in 1..5) {
+            if (key in excludePairs || key in groupedByLessonNumber.keys) continue
+            groupedByLessonNumber[key] = PairInfo(listOf(), listOf())
+        }
+        return groupedByLessonNumber
+    }
+
 
     @PostMapping("/schedule/edit/{groupId}")
     fun saveLesson(
@@ -62,67 +149,85 @@ class ScheduleEditController {
         @RequestParam subjectId: Int?,
         @RequestParam auditorium: Int?,
         @RequestParam dayOfTheWeek: String?,
+        @RequestParam locationId: Int?,
         model: Model
     ): String {
-        println(teacherId)
-        println(isOnline)
-        println(lessonNumber)
-        println(regularity)
-        println(subjectId)
-        println(auditorium)
-        println(dayOfTheWeek)
-        if (auditorium != null && teacherId != null && lessonNumber != null && regularity != null && subjectId != null && auditorium != null && dayOfTheWeek != null) {
-            val newLesson = LessonSchedule()
+//        println(teacherId)
+//        println(isOnline)
+//        println(lessonNumber)
+//        println(regularity)
+//        println(subjectId)
+//        println(auditorium)
+//        println(dayOfTheWeek)
+//        println(locationId)
+        if (locationId != null && auditorium != null && teacherId != null && lessonNumber != null && regularity != null && subjectId != null && auditorium != null && dayOfTheWeek != null) {
+
             val lessonType = getLessonType(regularity)
             val teacher = teacherRepository.findById(teacherId).get()
-            val weekDay = getWeekDay(dayOfTheWeek)
-            newLesson.lessonNumber = lessonNumber
-            newLesson.lessonLocation = "7 корпус"
-
-            newLesson.teacher = teacher
-            newLesson.online = isOnline ?: false //по умолчанию приходит null
-
-            newLesson.lessonType = lessonType
-            newLesson.subject = subjectRepository.findById(subjectId).get()
-            newLesson.auditorium = auditoriumRepository.findById(auditorium).get()
-
-            newLesson.weekDay = weekDay
-            newLesson.dateCreated = Date(System.currentTimeMillis())
-            val sameLesson =
-                lessonScheduleRepository.findByTeacherAndWeekDayAndLessonNumberAndLessonType(
-                    teacher,
-                    weekDay,
-                    lessonNumber,
-                    lessonType
-                )
-            val currentGroup = groupRepository.findById(groupId).get()
-            if (sameLesson != null) {
-                if (currentGroup.groupId !in sameLesson.groups.map { it.groupId })
-                    sameLesson.groups = sameLesson.groups.plus(currentGroup)
-                lessonScheduleRepository.save(sameLesson)
-            } else {
-                newLesson.groups = listOf(currentGroup)
-                lessonScheduleRepository.save(newLesson)
-            }
+            val weekDay = WeekDay.valueOf(dayOfTheWeek)
+            val newLesson =
+                buildNewLesson(lessonNumber, locationId, teacher, isOnline, lessonType, subjectId, auditorium, weekDay)
+            saveNewLesson(teacher, weekDay, lessonNumber, lessonType, groupId, newLesson)
         }
 
         fillModelDefaultData(model, groupId)
         return "lesson_schedule/edit"
     }
 
-    private fun getWeekDay(dayOfTheWeek: String): WeekDay? {
-        return when (dayOfTheWeek) {
-            "monday" -> WeekDay.MONDAY
-            "tuesday" -> WeekDay.TUESDAY
-            "friday" -> WeekDay.FRIDAY
-            "wednesday" -> WeekDay.WEDNESDAY
-            "thursday" -> WeekDay.THURSDAY
-            "saturday" -> WeekDay.SATURDAY
-            else -> throw IllegalAccessException("Wrong day of the week")
+    private fun saveNewLesson(
+        teacher: Teacher,
+        weekDay: WeekDay,
+        lessonNumber: Int,
+        lessonType: LessonType,
+        groupId: Int,
+        newLesson: LessonSchedule
+    ) {
+        val sameLesson =
+            lessonScheduleRepository.findByTeacherAndWeekDayAndLessonNumberAndLessonType(
+                teacher,
+                weekDay,
+                lessonNumber,
+                lessonType
+            )
+        val currentGroup = groupRepository.findById(groupId).get()
+        if (sameLesson != null) {
+            if (currentGroup.groupId !in sameLesson.groups.map { it.groupId })
+                sameLesson.groups = sameLesson.groups.plus(currentGroup)
+            lessonScheduleRepository.save(sameLesson)
+        } else {
+            newLesson.groups = listOf(currentGroup)
+            lessonScheduleRepository.save(newLesson)
         }
     }
 
-    private fun getLessonType(regularity: String): LessonType? {
+    private fun buildNewLesson(
+        lessonNumber: Int,
+        locationId: Int,
+        teacher: Teacher,
+        isOnline: Boolean?,
+        lessonType: LessonType,
+        subjectId: Int,
+        auditorium: Int,
+        weekDay: WeekDay
+    ): LessonSchedule {
+        val newLesson = LessonSchedule()
+        newLesson.lessonNumber = lessonNumber
+        newLesson.lessonLocation = lessonLocationRepository.findById(locationId).get()
+
+        newLesson.teacher = teacher
+        newLesson.online = isOnline ?: false //по умолчанию приходит null
+
+        newLesson.lessonType = lessonType
+        newLesson.subject = subjectRepository.findById(subjectId).get()
+        newLesson.auditorium = auditoriumRepository.findById(auditorium).get()
+
+        newLesson.weekDay = weekDay
+        newLesson.dateCreated = Date(System.currentTimeMillis())
+        println(newLesson)
+        return newLesson
+    }
+
+    private fun getLessonType(regularity: String): LessonType {
         return when (regularity) {
             "chis" -> LessonType.NUMERATOR
             "znam" -> LessonType.DENUMERATOR
@@ -131,3 +236,5 @@ class ScheduleEditController {
         }
     }
 }
+
+data class PairInfo(val busyTeachers: List<Int>, val busyAuditoriums: List<Int>)

@@ -147,7 +147,7 @@ public class LessonSchedule {
                 ", weekDay=" + weekDay +
                 ", lessonNumber=" + lessonNumber +
                 ", lessonType=" + lessonType +
-                ", lessonLocation='" + lessonLocation + '\'' +
+                ", lessonLocation=" + lessonLocation +
                 ", dateCreated=" + dateCreated +
                 ", teacher=" + teacher +
                 ", subject=" + subject +

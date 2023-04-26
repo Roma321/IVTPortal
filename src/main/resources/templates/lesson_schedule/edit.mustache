@@ -1,20 +1,27 @@
+{{> header}}
 <h1>Группа {{group}}:</h1>
+<h2>Рекомендуется заполнить сначала регулярность и день недели, затем номер пары, затем всё остальное</h2>
 <form method="post">
-
+    <div>
+        Регулярность проведения:
+        <select name="regularity" id = "regularitySelect">
+            <option value="chis_and_znam" selected="selected">Еженедельно</option>
+            <option value="chis">По числителям</option>
+            <option value="znam">По знаменателям</option>
+        </select>
+    </div>
     <div>
         День недели:
-        <select name="dayOfTheWeek">
-            <option value="monday" selected="selected">Понедельник</option>
-            <option value="tuesday">Вторник</option>
-            <option value="wednesday">Среда</option>
-            <option value="thursday">Четверг</option>
-            <option value="friday">Пятница</option>
-            <option value="saturday">Суббота</option>
+        <select name="dayOfTheWeek" id = "dayOfTheWeek">
+            {{#daysOfWeek}}
+                <option value={{value}}>{{name}}</option>
+            {{/daysOfWeek}}
+
         </select>
     </div>
     <div>
         Номер пары:
-        <select name="lessonNumber">
+        <select name="lessonNumber" id ="lessonNumber">
             <option value=1>1</option>
             <option value=2>2</option>
             <option value=3>3</option>
@@ -22,47 +29,126 @@
             <option value=5>5</option>
         </select>
     </div>
+
     <div>
         Преподаватель:
-        <select name="teacherId">
-            {{#teachers}}
-                <option value={{id}}>{{fullName}}</option>
-            {{/teachers}}
+        <select name="teacherId" id = "teachers">
         </select>
     </div>
-    <div>
-        Регулярность проведения:
-        <select name="regularity">
-            <option value="chis_and_znam" selected="selected">Еженедельно</option>
-            <option value="chis">По числителям</option>
-            <option value="znam">По знаменателям</option>
-        </select>
-    </div>
+
     <div>
         Учебный предмет:
-        <select name="subjectId">
+        <select name="subjectId" id="subject">
             {{#subjects}}
                 <option value={{subjectId}}>{{subjectName}}</option>
             {{/subjects}}
         </select>
     </div>
     <div>
-        Проводится онлайн <input type="checkbox" name="isOnline" checked="checked">
+        Проводится онлайн <input type="checkbox" name="isOnline" id="isOnlineCheckbox">
     </div>
     <div>
-        Аудитория:
-        <select name="auditorium">
-            {{#auditoriums}}
-                <option value={{auditoriumNumber}}>{{auditoriumNumber}}</option>
-            {{/auditoriums}}
+        Место проведения:
+        <select name="locationId">
+            {{#locations}}
+                <option value={{lessonLocationId}}>{{lessonLocation}}</option>
+            {{/locations}}
         </select>
+    </div>
+    <div id ="auditoriumsDiv">
+        Аудитория:
+        <select name="auditorium" id="auditorium"></select>
     </div>
     <div>
         <button type="submit">Добавить</button>
     </div>
 </form>
 <script>
-    console.log(JSON.parse("{{subjects_json}}".replaceAll("&quot;",'"')))
+        auditoriums = JSON.parse("{{auditoriums}}".replaceAll("&quot;",'"'))
+        teachers = JSON.parse("{{teachers}}".replaceAll("&quot;",'"'))
+        busyness = JSON.parse("{{busynessInfo}}".replaceAll("&quot;",'"'))
+
+        regularitySelect = document.getElementById('regularitySelect')
+        auditoriumsSelect = document.getElementById('auditorium')
+        dayOfTheWeekSelect = document.getElementById('dayOfTheWeek')
+        lessonNumberSelect = document.getElementById("lessonNumber")
+        teachersSelect = document.getElementById('teachers')
+        isOnlineCheckbox = document.getElementById('isOnlineCheckbox')
+        auditoriumsDiv = document.getElementById('auditoriumsDiv')
+
+        fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
+
+        isOnlineCheckbox.addEventListener("change", () => {
+            if (isOnlineCheckbox.checked) {
+                auditoriumsDiv.style.display = 'none'
+            } else {
+                auditoriumsDiv.style.display = 'block'
+            }
+        })
+
+        console.log(busyness)
+        dayOfTheWeekSelect.addEventListener("change", () => {
+            fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
+        });
+        regularitySelect.addEventListener("change", () => {
+            fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
+        });
 
 
-</script>
+        function fillPairs(day) {
+            saveValue = lessonNumberSelect.value
+            lessonNumberSelect.innerText = ''
+            lessonsAvailable = Object.keys(day)
+            lessonsAvailable.map(s => {
+                let option = document.createElement('option')
+                option.value = s
+                option.innerText = s
+                lessonNumberSelect.append(option)
+            })
+            if (lessonsAvailable.includes(saveValue)) {
+                lessonNumberSelect.value = saveValue
+            }
+            fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
+            fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
+        }
+
+        lessonNumberSelect.addEventListener("change", () => {
+            fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
+            fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
+        })
+
+        function fillTeachers(excludeTeachers) {
+            saveValue = +teachersSelect.value
+            teachersSelect.innerText = ''
+            teachers.map(teacher => {
+                if (!(excludeTeachers.includes(teacher['id']))) {
+                    let option = document.createElement('option')
+                    option.value = teacher['id']
+                    option.innerText = teacher['fullName']
+                    teachersSelect.append(option)
+                }
+            }
+            )
+            if (!(excludeTeachers.includes(saveValue) ||saveValue=='')) {
+                teachersSelect.value = saveValue
+            }
+        }
+
+        function fillAuditoriums(excludeAuditoriums) {
+            saveValue = +auditoriumsSelect.value
+            auditoriumsSelect.innerText = ''
+            auditoriums.map(auditorium => {
+                if (!(excludeAuditoriums.includes(auditorium['auditoriumNumber']))) {
+                    let option = document.createElement('option')
+                    option.value = auditorium['auditoriumNumber']
+                    option.innerText = auditorium['auditoriumNumber']
+                    auditoriumsSelect.append(option)
+                }
+            }
+            )
+            if (!(excludeAuditoriums.includes(saveValue)||saveValue=='')) {
+                auditoriumsSelect.value = saveValue
+            }
+        }
+    </script>
+{{> footer}}
