@@ -30,11 +30,11 @@ public class LessonSchedule {
     @Enumerated(EnumType.STRING)
     private LessonType lessonType;
 
-    @Column(name = "lesson_location", length = 64, nullable = false)
-    private String lessonLocation;
-
     @Column(name = "date_created", nullable = false)
     private java.sql.Date dateCreated;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private LessonLocation lessonLocation;
 
     @OneToOne(fetch = FetchType.EAGER)
     private Teacher teacher;
@@ -46,7 +46,7 @@ public class LessonSchedule {
     @OneToOne(fetch = FetchType.EAGER)
     private Auditorium auditorium;
 
-    @OneToMany
+    @ManyToMany
     private List<Group> groups;
 
     public Integer getLessonId() {
@@ -91,11 +91,11 @@ public class LessonSchedule {
         this.lessonType = lessonType;
     }
 
-    public String getLessonLocation() {
+    public LessonLocation getLessonLocation() {
         return lessonLocation;
     }
 
-    public void setLessonLocation(String lessonLocation) {
+    public void setLessonLocation(LessonLocation lessonLocation) {
         this.lessonLocation = lessonLocation;
     }
 
@@ -137,5 +137,22 @@ public class LessonSchedule {
 
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    @Override
+    public String toString() {
+        return "LessonSchedule{" +
+                "lessonId=" + lessonId +
+                ", isOnline=" + isOnline +
+                ", weekDay=" + weekDay +
+                ", lessonNumber=" + lessonNumber +
+                ", lessonType=" + lessonType +
+                ", lessonLocation=" + lessonLocation +
+                ", dateCreated=" + dateCreated +
+                ", teacher=" + teacher +
+                ", subject=" + subject +
+                ", auditorium=" + auditorium +
+                ", groups=" + groups +
+                '}';
     }
 }
