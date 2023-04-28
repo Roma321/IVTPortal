@@ -10,6 +10,7 @@
         p {text-align: left}
         a {text-align: left}
     </style>
+    <script src="/resit/resit.js"></script>
 </head>
 <body>
 <h2>Редактирование пересдачи</h2>
@@ -37,9 +38,6 @@
             <p>
                 <label for="teacherId">Преподаватель:</label>
                 <select type="number" id="teacherId" name="teacherId">
-                    {{#teacher}}
-                    <option value="{{teacherId}}">{{lastName}} {{firstName}} {{patronymic}}</option>
-                    {{/teacher}}
                     {{#teachers}}
                         <option value="{{teacherId}}">{{lastName}} {{firstName}} {{patronymic}}</option>
                     {{/teachers}}
@@ -49,9 +47,6 @@
             <p>
                 <label for="auditoriumNumber">Аудитория:</label>
                 <select type="number" id="auditoriumNumber" name="auditoriumNumber">
-                    {{#auditorium}}
-                        <option value="{{auditoriumNumber}}">{{auditoriumNumber}}</option>
-                    {{/auditorium}}
                     {{#auditoriums}}
                         <option value="{{auditoriumNumber}}">{{auditoriumNumber}}</option>
                     {{/auditoriums}}
@@ -61,14 +56,11 @@
             <p>
                 <label for="subjectId">Предмет:</label>
                 <select type="number" id="subjectId" name="subjectId">
-                    {{#subject}}
-                        <option value="{{subjectId}}">{{subjectName}}</option>
-                    {{/subject}}
                     {{#subjects}}
-                        <option value="{{subjectId}}">{{subjectName}}</option>
+                        <option id="{{subjectId}}" value="{{subjectId}}"
+                        >{{subjectName}}</option>
                     {{/subjects}}
                 </select>
-                </label>
             </p>
             <p>
                 <label for="isOnline">Онлайн: </label>
@@ -92,6 +84,12 @@
         </form>
     </div>
 </div>
+
+<script defer>
+    setSelection("subjectId", {{#subject}}{{subjectId}}{{/subject}})
+    setSelection("teacherId", {{#teacher}}{{teacherId}}{{/teacher}})
+    setSelection("auditoriumNumber", {{#auditorium}}{{auditoriumNumber}}{{/auditorium}})
+</script>
 {{/resit}}
 </body>
 
