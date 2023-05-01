@@ -18,6 +18,14 @@
 <div id="main-form-style">
 <form action="/resit/add" method="POST">
     <p>
+        <label for="groupId">Группа: </label>
+        <select type="number" id="groupId" name="groupId">
+            {{#resitGroups}}
+                <option value="{{groupId}}">{{toString}}</option>
+            {{/resitGroups}}
+        </select>
+    </p>
+    <p>
         <label for="date">Дата проведения: </label>
         <input type="date" id="date" name="date"/>
     </p>

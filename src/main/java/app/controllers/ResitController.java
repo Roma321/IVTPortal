@@ -1,10 +1,8 @@
 package app.controllers;
 
-import app.models.Auditorium;
-import app.models.Resit;
-import app.models.Subject;
-import app.models.Teacher;
+import app.models.*;
 import app.services.auditorium.AuditoriumService;
+import app.services.group.GroupService;
 import app.services.resit.ResitService;
 import app.services.subject.SubjectService;
 import app.services.teacher.TeacherService;
@@ -17,8 +15,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Controller
@@ -27,16 +25,21 @@ public class ResitController {
     private final TeacherService teacherService;
     private final SubjectService subjectService;
     private final AuditoriumService auditoriumService;
+    private final GroupService groupService;
 
     @Autowired
-    public ResitController(ResitService resitService, TeacherService teacherService, SubjectService subjectService, AuditoriumService auditoriumService) {
+    public ResitController(ResitService resitService, TeacherService teacherService, SubjectService subjectService,
+                           AuditoriumService auditoriumService, GroupService groupService) {
         this.resitService = resitService;
         this.teacherService = teacherService;
         this.subjectService = subjectService;
         this.auditoriumService = auditoriumService;
+        this.groupService = groupService;
     }
     @PostMapping("/resit/add")
     public String addResit(@RequestParam (value = "resitId", required = false) Integer id,
+                           @RequestParam (value = "groupId", required = false)
+                               Integer groupId,
                            @RequestParam (value = "date", required = false)
                            @DateTimeFormat(pattern = "yyyy-MM-dd")
                                LocalDate date,
@@ -61,9 +64,13 @@ public class ResitController {
                            ) {
 
         Resit resit = id == null ? new Resit() : resitService.getById(id);
+        List<Group> groupList = new ArrayList<>();
+        Group group = groupService.getById(groupId);
+        groupList.add(group);
         Teacher resitTeacher = teacherService.getById(teacherId);
         Auditorium resitAuditorium = auditoriumService.getById(auditoriumNumber);
         Subject resitSubject = subjectService.getById(subjectId);
+        resit.setGroups(groupList);
         resit.setDate(date == null ? null : Date.valueOf(date));
         resit.setTimeStart(timeStart == null ? null : Time.valueOf(timeStart));
         resit.setTimeDuration(timeDuration == null ? null : Time.valueOf(timeDuration));
@@ -82,6 +89,8 @@ public class ResitController {
     }
     @GetMapping("/resit/add")
     public String addResit(Model model) {
+        Iterable<Group> resitGroups = groupService.getAll();
+        model.addAttribute("resitGroups", resitGroups);
         Iterable<Teacher> teachers = teacherService.getAll();
         model.addAttribute("teachers", teachers);
         Iterable<Subject> subjects = subjectService.getAll();
@@ -104,6 +113,8 @@ public class ResitController {
     }
     @GetMapping("/resit/edit/{id}")
     public String editResit(Model model, @PathVariable Integer id) {
+        Iterable<Group> resitGroups = groupService.getAll();
+        model.addAttribute("resitGroups", resitGroups);
         Iterable<Teacher> teachers = teacherService.getAll();
         model.addAttribute("teachers", teachers);
         Iterable<Subject> subjects = subjectService.getAll();

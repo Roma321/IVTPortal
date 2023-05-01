@@ -20,12 +20,12 @@ public class AuditoriumServiceImpl implements AuditoriumService {
 
     @Override
     public void deleteAuditorium(Integer id) {
-         repository.deleteById(id);
+        repository.deleteById(id);
     }
 
     @Override
     public Auditorium getById(Integer id) {
-       return repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow();
     }
 
     @Override
