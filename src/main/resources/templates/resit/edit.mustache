@@ -24,6 +24,14 @@
                 <input type="hidden" id="resitId" name="resitId" value="{{resitId}}">
             </p>
             <p>
+                <label for="groupId">Группа: </label>
+                <select type="number" id="groupId" name="groupId">
+                    {{#resitGroups}}
+                        <option value="{{groupId}}">{{toString}}</option>
+                    {{/resitGroups}}
+                </select>
+            </p>
+            <p>
                 <label for="date">Дата проведения: </label>
                 <input type="date" id="date" name="date" value="{{date}}">
             </p>

@@ -19,6 +19,7 @@
 <table>
     <tr>
         <th>Дата проведения</th>
+        <th>Группа</th>
         <th>Предмет</th>
         <th>Преподаватель</th>
         <th>Аудитория</th>
@@ -32,6 +33,7 @@
     {{#resits}}
         <tr>
             <td>{{date}}</td>
+            <td>{{#groups}} {{toString}} {{/groups}}</td>
             <td>{{#getSubject}}{{subjectName}}{{/getSubject}}</td>
             <td>{{#getTeacher}}{{lastName}} {{firstName}} {{patronymic}}{{/getTeacher}}</td>
             <td>{{#getAuditorium}}{{auditoriumNumber}}{{/getAuditorium}}</td>

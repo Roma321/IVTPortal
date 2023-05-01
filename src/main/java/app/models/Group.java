@@ -70,4 +70,10 @@ public class Group {
     public void setPeopleAmount(Integer peopleAmount) {
         this.peopleAmount = peopleAmount;
     }
+
+    @Override
+    public String toString() {
+        return groupName;
+    }
+
 }
