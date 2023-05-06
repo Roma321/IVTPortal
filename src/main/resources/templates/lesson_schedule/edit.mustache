@@ -1,10 +1,14 @@
 {{> header}}
 <h1>Группа {{group}}:</h1>
-<h2>Рекомендуется заполнить сначала регулярность и день недели, затем номер пары, затем всё остальное</h2>
+<h2>Рекомендуется заполнить сначала тип (лекция/нет), регулярность и день недели, затем номер пары, затем всё остальное</h2>
 <table>
     <tr valign="top">
         <td>
             <form method="post">
+                <div>
+                    Лекция <input type="checkbox" name="isLection" id="isLectionCheckbox"> (если выбрать этот пункт, то не будут применяться проверки занятости аудиторий, преподавателей и т. д.) 
+                </div>
+
                 <div>
                     Регулярность проведения:
                     <select name="regularity" id="regularitySelect">
@@ -17,7 +21,7 @@
                     День недели:
                     <select name="dayOfTheWeek" id="dayOfTheWeek">
                         {{#daysOfWeek}}
-                            <option value={{value}}>{{name}}</option>
+                        <option value={{value}}>{{name}}</option>
                         {{/daysOfWeek}}
 
                     </select>
@@ -43,7 +47,7 @@
                     Учебный предмет:
                     <select name="subjectId" id="subject">
                         {{#subjects}}
-                            <option value={{subjectId}}>{{subjectName}}</option>
+                        <option value={{subjectId}}>{{subjectName}}</option>
                         {{/subjects}}
                     </select>
                 </div>
@@ -54,7 +58,7 @@
                     Место проведения:
                     <select name="locationId">
                         {{#locations}}
-                            <option value={{lessonLocationId}}>{{lessonLocation}}</option>
+                        <option value={{lessonLocationId}}>{{lessonLocation}}</option>
                         {{/locations}}
                     </select>
                 </div>
@@ -71,7 +75,7 @@
             <table border="1" id="schedule">
                 <tr>
                     <td colspan="2">
-                        Расписание группы  {{group}}
+                        Расписание группы {{group}}
                     </td>
                 </tr>
             </table>
@@ -80,171 +84,185 @@
 </table>
 <script>
 
-        auditoriums = JSON.parse("{{auditoriums}}".replaceAll("&quot;",'"'))
-        teachers = JSON.parse("{{teachers}}".replaceAll("&quot;",'"'))
-        busyness = JSON.parse("{{busynessInfo}}".replaceAll("&quot;",'"'))
-        schedule = JSON.parse("{{displaySchedule}}".replaceAll("&quot;",'"'))
-        regularitySelect = document.getElementById('regularitySelect')
-        auditoriumsSelect = document.getElementById('auditorium')
-        dayOfTheWeekSelect = document.getElementById('dayOfTheWeek')
-        lessonNumberSelect = document.getElementById("lessonNumber")
-        teachersSelect = document.getElementById('teachers')
-        isOnlineCheckbox = document.getElementById('isOnlineCheckbox')
-        auditoriumsDiv = document.getElementById('auditoriumsDiv')
-        scheduleTable = document.getElementById('schedule')
-        rightDayOrder = []
-        for (let item of dayOfTheWeekSelect.options) {
-            s = { name: item.text, value: item.value }
-            rightDayOrder.push(s)
+    auditoriums = JSON.parse("{{auditoriums}}".replaceAll("&quot;", '"'))
+    teachers = JSON.parse("{{teachers}}".replaceAll("&quot;", '"'))
+    busyness = JSON.parse("{{busynessInfo}}".replaceAll("&quot;", '"'))
+    schedule = JSON.parse("{{displaySchedule}}".replaceAll("&quot;", '"'))
+    regularitySelect = document.getElementById('regularitySelect')
+    auditoriumsSelect = document.getElementById('auditorium')
+    dayOfTheWeekSelect = document.getElementById('dayOfTheWeek')
+    lessonNumberSelect = document.getElementById("lessonNumber")
+    teachersSelect = document.getElementById('teachers')
+    isOnlineCheckbox = document.getElementById('isOnlineCheckbox')
+    isLectionCheckbox = document.getElementById('isLectionCheckbox')
+    auditoriumsDiv = document.getElementById('auditoriumsDiv')
+    scheduleTable = document.getElementById('schedule')
+    rightDayOrder = []
+    for (let item of dayOfTheWeekSelect.options) {
+        s = { name: item.text, value: item.value }
+        rightDayOrder.push(s)
+    }
+
+    // console.log(rightDayOrder)
+
+    for (let day of rightDayOrder) {
+        headerTr = document.createElement('tr')
+        headerB = document.createElement('b')
+        headerB.innerText = day.name
+        headerTd = document.createElement('td')
+        // console.log(headerTd)
+        headerTd.setAttribute("colspan", 2)
+        headerTd.append(headerB)
+        headerTr.append(headerTd)
+        scheduleTable.append(headerTr)
+        if (schedule[day.value] === undefined) {
+            fill5empty()
+            continue
         }
-
-        // console.log(rightDayOrder)
-
-        for (let day of rightDayOrder) {
-            headerTr = document.createElement('tr')
-            headerB = document.createElement('b')
-            headerB.innerText = day.name
-            headerTd = document.createElement('td')
-            // console.log(headerTd)
-            headerTd.setAttribute("colspan", 2)
-            headerTd.append(headerB)
-            headerTr.append(headerTd)
-            scheduleTable.append(headerTr)
-            if (schedule[day.value] === undefined) {
-                fill5empty()
-                continue
-            }
-            for (i = 1; i < 6; i++) {
-                tr = document.createElement('tr')
-                numTd = document.createElement('td')
-                numTd.innerText = i
-                data = schedule[day.value][i]
-                lessonTd = document.createElement('td')
-                if (data === undefined) {
-                    tr.append(numTd)
-                    tr.append(lessonTd)
-                    scheduleTable.append(tr)
-                    continue
-                }
-                data = data.sort(function (a, b) {
-                    return b.regularity.localeCompare(a.regularity) //Чтобы числитель шёл после знаменателя
-                });
-                console.log(data)
-                for (let lesson of data) {
-                    console.log(lesson.regularity)
-                    if (lesson.regularity == "NUMERATOR") {
-                        b = document.createElement('b')
-                        b.innerText = "Числитель "
-                        lessonTd.append(b)
-                    }
-                    if (lesson.regularity == "DENOMINATOR") {
-                        b = document.createElement('b')
-                        b.innerText = "Знаменатель "
-                        lessonTd.append(b)
-                    }
-                    if (lesson.isOnline) {
-                        lessonTd.append(`${lesson.name}, ${lesson.teacher} онлайн`)
-                    } else {
-                        lessonTd.append(`${lesson.name}, ${lesson.teacher} (Ауд. ${lesson.auditorium}, ${lesson.location})`)
-                    }
-                    br = document.createElement('br')
-                    lessonTd.append(br)
-                }
+        for (i = 1; i < 6; i++) {
+            tr = document.createElement('tr')
+            numTd = document.createElement('td')
+            numTd.innerText = i
+            data = schedule[day.value][i]
+            lessonTd = document.createElement('td')
+            if (data === undefined) {
                 tr.append(numTd)
                 tr.append(lessonTd)
                 scheduleTable.append(tr)
+                continue
             }
-        }
-
-        function fill5empty() {
-            for (i = 1; i < 6; i++) {
-                tr = document.createElement('tr')
-                numTd = document.createElement('td')
-                numTd.innerText = i
-                emptyTd = document.createElement('td')
-                tr.append(numTd)
-                tr.append(emptyTd)
-                scheduleTable.append(tr)
+            data = data.sort(function (a, b) {
+                return b.regularity.localeCompare(a.regularity) //Чтобы числитель шёл перед знаменателем
+            });
+            console.log(data)
+            for (let lesson of data) {
+                console.log(lesson.regularity)
+                if (lesson.regularity == "NUMERATOR") {
+                    b = document.createElement('b')
+                    b.innerText = "Числитель "
+                    lessonTd.append(b)
+                }
+                if (lesson.regularity == "DENOMINATOR") {
+                    b = document.createElement('b')
+                    b.innerText = "Знаменатель "
+                    lessonTd.append(b)
+                }
+                if (lesson.isOnline) {
+                    lessonTd.append(`${lesson.name}, ${lesson.teacher} онлайн`)
+                } else {
+                    lessonTd.append(`${lesson.name}, ${lesson.teacher} (Ауд. ${lesson.auditorium}, ${lesson.location})`)
+                }
+                br = document.createElement('br')
+                lessonTd.append(br)
             }
+            tr.append(numTd)
+            tr.append(lessonTd)
+            scheduleTable.append(tr)
         }
+    }
 
-        console.log(scheduleTable)
+    function fill5empty() {
+        for (i = 1; i < 6; i++) {
+            tr = document.createElement('tr')
+            numTd = document.createElement('td')
+            numTd.innerText = i
+            emptyTd = document.createElement('td')
+            tr.append(numTd)
+            tr.append(emptyTd)
+            scheduleTable.append(tr)
+        }
+    }
 
+    console.log(scheduleTable)
+
+    fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
+
+    isOnlineCheckbox.addEventListener("change", () => {
+        if (isOnlineCheckbox.checked) {
+            auditoriumsDiv.style.display = 'none'
+        } else {
+            auditoriumsDiv.style.display = 'block'
+        }
+    })
+
+    isLectionCheckbox.addEventListener("change", () => {
+        if (isLectionCheckbox.checked) {
+            fillAllFree();
+        } else {
+            fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
+        }
+    })
+
+    console.log(busyness)
+    dayOfTheWeekSelect.addEventListener("change", () => {
         fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
+    });
+    regularitySelect.addEventListener("change", () => {
+        fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
+    });
 
-        isOnlineCheckbox.addEventListener("change", () => {
-            if (isOnlineCheckbox.checked) {
-                auditoriumsDiv.style.display = 'none'
-            } else {
-                auditoriumsDiv.style.display = 'block'
-            }
+
+    function fillPairs(day) {
+        saveValue = lessonNumberSelect.value
+        lessonNumberSelect.innerText = ''
+        lessonsAvailable = Object.keys(day)
+        lessonsAvailable.map(s => {
+            let option = document.createElement('option')
+            option.value = s
+            option.innerText = s
+            lessonNumberSelect.append(option)
         })
+        if (lessonsAvailable.includes(saveValue)) {
+            lessonNumberSelect.value = saveValue
+        }
+        if (isLectionCheckbox.checked) return
+        fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
+        fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
+    }
 
-        console.log(busyness)
-        dayOfTheWeekSelect.addEventListener("change", () => {
-            fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
-        });
-        regularitySelect.addEventListener("change", () => {
-            fillPairs(busyness[dayOfTheWeekSelect.value][regularitySelect.value])
-        });
+    lessonNumberSelect.addEventListener("change", () => {
+        if (isLectionCheckbox.checked) return
+        fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
+        fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
+    })
 
-
-        function fillPairs(day) {
-            saveValue = lessonNumberSelect.value
-            lessonNumberSelect.innerText = ''
-            lessonsAvailable = Object.keys(day)
-            lessonsAvailable.map(s => {
+    function fillTeachers(excludeTeachers) {
+        saveValue = +teachersSelect.value
+        teachersSelect.innerText = ''
+        teachers.map(teacher => {
+            if (!(excludeTeachers.includes(teacher['id']))) {
                 let option = document.createElement('option')
-                option.value = s
-                option.innerText = s
-                lessonNumberSelect.append(option)
-            })
-            if (lessonsAvailable.includes(saveValue)) {
-                lessonNumberSelect.value = saveValue
-            }
-            fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
-            fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
-        }
-
-        lessonNumberSelect.addEventListener("change", () => {
-            fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
-            fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
-        })
-
-        function fillTeachers(excludeTeachers) {
-            saveValue = +teachersSelect.value
-            teachersSelect.innerText = ''
-            teachers.map(teacher => {
-                if (!(excludeTeachers.includes(teacher['id']))) {
-                    let option = document.createElement('option')
-                    option.value = teacher['id']
-                    option.innerText = teacher['fullName']
-                    teachersSelect.append(option)
-                }
-            }
-            )
-            if (!(excludeTeachers.includes(saveValue) || saveValue == '')) {
-                teachersSelect.value = saveValue
+                option.value = teacher['id']
+                option.innerText = teacher['fullName']
+                teachersSelect.append(option)
             }
         }
+        )
+        if (!(excludeTeachers.includes(saveValue) || saveValue == '')) {
+            teachersSelect.value = saveValue
+        }
+    }
 
-        function fillAuditoriums(excludeAuditoriums) {
-            saveValue = +auditoriumsSelect.value
-            auditoriumsSelect.innerText = ''
-            auditoriums.map(auditorium => {
-                if (!(excludeAuditoriums.includes(auditorium['auditoriumNumber']))) {
-                    let option = document.createElement('option')
-                    option.value = auditorium['auditoriumNumber']
-                    option.innerText = auditorium['auditoriumNumber']
-                    auditoriumsSelect.append(option)
-                }
-            }
-            )
-            if (!(excludeAuditoriums.includes(saveValue) || saveValue == '')) {
-                auditoriumsSelect.value = saveValue
+    function fillAuditoriums(excludeAuditoriums) {
+        saveValue = +auditoriumsSelect.value
+        auditoriumsSelect.innerText = ''
+        auditoriums.map(auditorium => {
+            if (!(excludeAuditoriums.includes(auditorium['auditoriumNumber']))) {
+                let option = document.createElement('option')
+                option.value = auditorium['auditoriumNumber']
+                option.innerText = auditorium['auditoriumNumber']
+                auditoriumsSelect.append(option)
             }
         }
+        )
+        if (!(excludeAuditoriums.includes(saveValue) || saveValue == '')) {
+            auditoriumsSelect.value = saveValue
+        }
+    }
 
-
+    function fillAllFree(){
+        fillTeachers([])
+        fillAuditoriums([])
+    }
 </script>
 {{> footer}}
