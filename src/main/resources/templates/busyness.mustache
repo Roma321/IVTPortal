@@ -1,0 +1,112 @@
+{{> header}}
+<table border="1" id="table">
+
+</table>
+{{> footer}}
+<script>
+    items = JSON.parse("{{items}}".replaceAll("&quot;", '"'))
+    table = document.getElementById('table')
+    itemsNumber = Object.keys(items).length
+    rightDayOrder = [
+        {
+            "name": "Понедельник",
+            "value": "MONDAY"
+        },
+        {
+            "name": "Вторник",
+            "value": "TUESDAY"
+        },
+        {
+            "name": "Среда",
+            "value": "WEDNESDAY"
+        },
+        {
+            "name": "Четверг",
+            "value": "THURSDAY"
+        },
+        {
+            "name": "Пятница",
+            "value": "FRIDAY"
+        },
+        {
+            "name": "Суббота",
+            "value": "SATURDAY"
+        },
+        {
+            "name": "Воскресенье",
+            "value": "SUNDAY"
+        }
+    ]
+    // Заголовки стобцов
+    namesTr = document.createElement('tr')
+    namesTr.append(document.createElement('td'))
+    namesTr.append(document.createElement('td'))
+    for (let key in items) {
+        nameTd = document.createElement('td')
+        nameTd.innerText = key
+        namesTr.append(nameTd)
+    }
+    table.append(namesTr)
+
+    for (let day of rightDayOrder) {
+        //Название дня недели
+        headerTr = document.createElement('tr')
+        headerB = document.createElement('b')
+        headerB.innerText = day.name
+        headerTd = document.createElement('td')
+        headerTd.setAttribute("colspan", 2 + itemsNumber)
+        headerTd.append(headerB)
+        headerTr.append(headerTd)
+        table.append(headerTr)
+
+        for (let i = 1; i < 6; i++) {
+            upperTr = document.createElement('tr')
+            numberTd = document.createElement('td')
+            numberTd.setAttribute('rowspan', 2)
+            numberTd.innerText = i
+            upperTr.append(numberTd)
+            regularityInfoUp = document.createElement('td')
+            regularityInfoUp.innerText = "Числитель"
+            upperTr.append(regularityInfoUp)
+
+            for (let key in items) {
+                color = '#B24444'
+                if (items[key][day.value] == undefined) {
+                    color = '#FFFFFF'
+                } else {
+                    const lessonInfo = items[key][day.value][i]
+                    if (lessonInfo == undefined || lessonInfo.length == 1 && lessonInfo[0] == 'DENOMINATOR') {
+                        color = '#FFFFFF'
+                    }
+                }
+
+                busynessInfoTd = document.createElement('td')
+                busynessInfoTd.setAttribute('bgcolor', color)
+                upperTr.append(busynessInfoTd)
+            }
+            table.append(upperTr)
+
+            lowerTr = document.createElement('tr')
+            regularityInfoLow = document.createElement('td')
+            regularityInfoLow.innerText = "Знаменатель"
+            lowerTr.append(regularityInfoLow)
+
+            for (let key in items) {
+                color = '#B24444'
+                if (items[key][day.value] == undefined) {
+                    color = '#FFFFFF'
+                } else {
+                    const lessonInfo = items[key][day.value][i]
+                    if (lessonInfo == undefined || lessonInfo.length == 1 && lessonInfo[0] == 'NUMERATOR') {
+                        color = '#FFFFFF'
+                    }
+                }
+                busynessInfoTd = document.createElement('td')
+                busynessInfoTd.setAttribute('bgcolor', color)
+                lowerTr.append(busynessInfoTd)
+            }
+            table.append(lowerTr)
+        }
+    }
+
+</script>
