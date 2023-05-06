@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import java.sql.Date
+import kotlin.jvm.optionals.getOrNull
 
 @Controller
 class ScheduleEditController {
@@ -49,7 +50,7 @@ class ScheduleEditController {
     }
 
     private fun fillModelDefaultData(model: Model, groupId: Int) {
-        val group = groupRepository.findById(groupId).get()
+        val group = groupRepository.findById(groupId).getOrNull()
         val currentSchedule = lessonScheduleRepository.findLessonSchedulesByGroupsGroupId(groupId)
         val fullSchedule = lessonScheduleRepository.findAll().toList()
         val displaySchedule = getDisplaySchedule(currentSchedule)
@@ -58,7 +59,7 @@ class ScheduleEditController {
             getBusinessInfo(currentSchedule, fullSchedule)
         model["busynessInfo"] = mapper.writeValueAsString(busynessInfo)
         model["daysOfWeek"] = WeekDay.values().map { mapOf("value" to it, "name" to it.toRussianName()) }
-        model["group"] = group.groupName
+        model["group"] = if (group != null) group.groupName else ""
         model["locations"] = lessonLocationRepository.findAll()
         model["subjects"] = subjectRepository.findAll()
         val teachers = teacherRepository.findAll()
@@ -66,7 +67,7 @@ class ScheduleEditController {
         model["teachers"] = mapper.writeValueAsString(teachers)
         model["auditoriums"] = mapper.writeValueAsString(
             auditoriumRepository.findAll()
-                .filter { it.placeAmount >= group.peopleAmount })
+                .filter { group == null || it.placeAmount >= group.peopleAmount }) // Просто чтоб не вылетало
     }
 
 
