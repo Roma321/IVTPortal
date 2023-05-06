@@ -9,13 +9,17 @@ public class Auditorium {
 
     public Auditorium() {}
 
-    public Auditorium(Integer auditoriumNumber) {
-        this.auditoriumNumber = auditoriumNumber;
+    public Auditorium(Integer auditoriumId) {
+        this.auditoriumId = auditoriumId;
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auditorium_id")
-    private Integer auditoriumNumber;
+    private Integer auditoriumId;
+
+    @Column(name = "auditorium_number", nullable = false, length = 16)
+    private String auditoriumNumber;
 
     @Column(name = "place_amount", nullable = false)
     private Integer placeAmount;
@@ -24,11 +28,19 @@ public class Auditorium {
     @ColumnDefault("0")
     private Integer computerAmount;
 
-    public Integer getAuditoriumNumber() {
+    public Integer getAuditoriumId() {
+        return auditoriumId;
+    }
+
+    public void setAuditoriumId(Integer auditoriumId) {
+        this.auditoriumId = auditoriumId;
+    }
+
+    public String getAuditoriumNumber() {
         return auditoriumNumber;
     }
 
-    public void setAuditoriumNumber(Integer auditoriumNumber) {
+    public void setAuditoriumNumber(String auditoriumNumber) {
         this.auditoriumNumber = auditoriumNumber;
     }
 

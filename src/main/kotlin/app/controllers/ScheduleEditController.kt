@@ -134,7 +134,7 @@ class ScheduleEditController {
             it.lessonType in weeksLooking && it.lessonNumber !in excludePairs
         }.groupBy { it.lessonNumber }.mapValues { entry ->
             PairInfo(
-                busyAuditoriums = entry.value.map { it.auditorium.auditoriumNumber },
+                busyAuditoriums = entry.value.map { it.auditorium.auditoriumId },
                 busyTeachers = entry.value.map { it.teacher.teacherId })
         }.toMutableMap()
 
@@ -254,7 +254,7 @@ data class LessonItem(
 ) {
     constructor(it: LessonSchedule) : this(
         name = it.subject.subjectName,
-        auditorium = it.auditorium.auditoriumNumber,
+        auditorium = it.auditorium.auditoriumId,
         isOnline = it.online,
         location = it.lessonLocation.lessonLocation,
         regularity = it.lessonType,
