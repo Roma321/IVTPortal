@@ -1,0 +1,105 @@
+<table border="1" id="schedule">
+    <tr>
+        <td colspan="2">
+            Расписание группы {{group}}
+        </td>
+    </tr>
+</table>
+<script>
+    rightDayOrder = [
+        {
+            "name": "Понедельник",
+            "value": "MONDAY"
+        },
+        {
+            "name": "Вторник",
+            "value": "TUESDAY"
+        },
+        {
+            "name": "Среда",
+            "value": "WEDNESDAY"
+        },
+        {
+            "name": "Четверг",
+            "value": "THURSDAY"
+        },
+        {
+            "name": "Пятница",
+            "value": "FRIDAY"
+        },
+        {
+            "name": "Суббота",
+            "value": "SATURDAY"
+        },
+        {
+            "name": "Воскресенье",
+            "value": "SUNDAY"
+        }
+    ]
+    scheduleTable = document.getElementById('schedule')
+    schedule = JSON.parse("{{displaySchedule}}".replaceAll("&quot;", '"'))
+    for (let day of rightDayOrder) {
+        headerTr = document.createElement('tr')
+        headerB = document.createElement('b')
+        headerB.innerText = day.name
+        headerTd = document.createElement('td')
+        headerTd.setAttribute("colspan", 2)
+        headerTd.append(headerB)
+        headerTr.append(headerTd)
+        scheduleTable.append(headerTr)
+        if (schedule[day.value] === undefined) {
+            fill5empty()
+            continue
+        }
+        for (i = 1; i < 6; i++) {
+            tr = document.createElement('tr')
+            numTd = document.createElement('td')
+            numTd.innerText = i
+            data = schedule[day.value][i]
+            lessonTd = document.createElement('td')
+            if (data === undefined) {
+                tr.append(numTd)
+                tr.append(lessonTd)
+                scheduleTable.append(tr)
+                continue
+            }
+            data = data.sort(function (a, b) {
+                return b.regularity.localeCompare(a.regularity) //Чтобы числитель шёл перед знаменателем
+            });
+            for (let lesson of data) {
+                if (lesson.regularity == "NUMERATOR") {
+                    b = document.createElement('b')
+                    b.innerText = "Числитель "
+                    lessonTd.append(b)
+                }
+                if (lesson.regularity == "DENOMINATOR") {
+                    b = document.createElement('b')
+                    b.innerText = "Знаменатель "
+                    lessonTd.append(b)
+                }
+                if (lesson.isOnline) {
+                    lessonTd.append(`${lesson.name}, ${lesson.teacher} онлайн`)
+                } else {
+                    lessonTd.append(`${lesson.name}, ${lesson.teacher} (Ауд. ${lesson.auditorium}, ${lesson.location})`)
+                }
+                br = document.createElement('br')
+                lessonTd.append(br)
+            }
+            tr.append(numTd)
+            tr.append(lessonTd)
+            scheduleTable.append(tr)
+        }
+    }
+    
+    function fill5empty() {
+        for (i = 1; i < 6; i++) {
+            tr = document.createElement('tr')
+            numTd = document.createElement('td')
+            numTd.innerText = i
+            emptyTd = document.createElement('td')
+            tr.append(numTd)
+            tr.append(emptyTd)
+            scheduleTable.append(tr)
+        }
+    }
+</script>
