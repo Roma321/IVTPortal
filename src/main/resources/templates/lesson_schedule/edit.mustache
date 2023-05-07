@@ -55,14 +55,6 @@
                 <div>
                     Проводится онлайн <input type="checkbox" name="isOnline" id="isOnlineCheckbox">
                 </div>
-                <div>
-                    Место проведения:
-                    <select name="locationId">
-                        {{#locations}}
-                        <option value={{lessonLocationId}}>{{lessonLocation}}</option>
-                        {{/locations}}
-                    </select>
-                </div>
                 <div id="auditoriumsDiv">
                     Аудитория:
                     <select name="auditorium" id="auditorium"></select>
@@ -132,12 +124,14 @@
             lessonNumberSelect.value = saveValue
         }
         if (isLectionCheckbox.checked) return
+        if (lessonNumberSelect.value == '') return
         fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
         fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
     }
 
     lessonNumberSelect.addEventListener("change", () => {
         if (isLectionCheckbox.checked) return
+        if (lessonNumberSelect.value == '') return
         fillTeachers(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyTeachers"])
         fillAuditoriums(busyness[dayOfTheWeekSelect.value][regularitySelect.value][lessonNumberSelect.value]["busyAuditoriums"])
     })

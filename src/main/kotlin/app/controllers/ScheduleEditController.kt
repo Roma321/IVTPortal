@@ -79,7 +79,7 @@ class ScheduleEditController {
         @RequestParam lessonNumber: Int?,
         @RequestParam regularity: String?,
         @RequestParam subjectId: Int?,
-        @RequestParam auditorium: Int?,
+        @RequestParam auditorium: String?,
         @RequestParam dayOfTheWeek: String?,
         model: Model
     ): String {
@@ -127,7 +127,7 @@ class ScheduleEditController {
         isOnline: Boolean?,
         lessonType: LessonType,
         subjectId: Int,
-        auditorium: Int,
+        auditorium: String,
         weekDay: WeekDay
     ): LessonSchedule {
         val newLesson = LessonSchedule()
@@ -138,7 +138,7 @@ class ScheduleEditController {
 
         newLesson.lessonType = lessonType
         newLesson.subject = subjectRepository.findById(subjectId).get()
-        newLesson.auditorium = auditoriumRepository.findById(auditorium).get()
+        newLesson.auditorium = auditoriumRepository.findByAuditoriumNumber(auditorium)
 
         newLesson.weekDay = weekDay
         newLesson.dateCreated = Date(System.currentTimeMillis())
