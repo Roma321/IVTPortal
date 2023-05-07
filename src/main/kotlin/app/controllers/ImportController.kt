@@ -43,12 +43,12 @@ class ImportController {
 //            a.lessonLocation = location
 //            a.placeAmount = 0
 //            try {
-//                a.placeAmount = row.getCell(3).toString().toInt()
+//                a.placeAmount = row.getCell(3).toString().toDouble().toInt()
 //            } catch (_: Exception) {
 //            }
 //            a.computerAmount = 0
 //            try {
-//                a.computerAmount = row.getCell(5).toString().toInt()
+//                a.computerAmount = row.getCell(5).toString().toDouble().toInt()
 //            } catch (_: Exception) {
 //            }
 //            auditoriumRepository.save(a)
