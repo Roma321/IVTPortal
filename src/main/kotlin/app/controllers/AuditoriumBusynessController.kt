@@ -49,7 +49,7 @@ class BusynessController {
         return "busyness"
     }
 
-    private fun getAuditoriumNumber(it: LessonSchedule): Int? = it.auditorium.auditoriumNumber
+    private fun getAuditoriumNumber(it: LessonSchedule): String? = it.auditorium.auditoriumNumber
     private fun getTeacherShortFullNameForLesson(it: LessonSchedule): String {
         val t = it.teacher
         return "${t.lastName} ${t.firstName[0]}. ${t.patronymic[0]}."

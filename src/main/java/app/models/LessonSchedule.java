@@ -35,9 +35,6 @@ public class LessonSchedule implements Serializable {
     private java.sql.Date dateCreated;
 
     @OneToOne(fetch = FetchType.EAGER)
-    private LessonLocation lessonLocation;
-
-    @OneToOne(fetch = FetchType.EAGER)
     private Teacher teacher;
 
     @OneToOne(fetch = FetchType.EAGER)
@@ -92,14 +89,6 @@ public class LessonSchedule implements Serializable {
         this.lessonType = lessonType;
     }
 
-    public LessonLocation getLessonLocation() {
-        return lessonLocation;
-    }
-
-    public void setLessonLocation(LessonLocation lessonLocation) {
-        this.lessonLocation = lessonLocation;
-    }
-
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -148,7 +137,6 @@ public class LessonSchedule implements Serializable {
                 ", weekDay=" + weekDay +
                 ", lessonNumber=" + lessonNumber +
                 ", lessonType=" + lessonType +
-                ", lessonLocation=" + lessonLocation +
                 ", dateCreated=" + dateCreated +
                 ", teacher=" + teacher +
                 ", subject=" + subject +

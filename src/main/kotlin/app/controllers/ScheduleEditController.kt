@@ -81,15 +81,14 @@ class ScheduleEditController {
         @RequestParam subjectId: Int?,
         @RequestParam auditorium: Int?,
         @RequestParam dayOfTheWeek: String?,
-        @RequestParam locationId: Int?,
         model: Model
     ): String {
-        if (locationId != null && auditorium != null && teacherId != null && lessonNumber != null && regularity != null && subjectId != null && dayOfTheWeek != null) {
+        if (auditorium != null && teacherId != null && lessonNumber != null && regularity != null && subjectId != null && dayOfTheWeek != null) {
             val lessonType = getLessonType(regularity)
             val teacher = teacherRepository.findById(teacherId).get()
             val weekDay = WeekDay.valueOf(dayOfTheWeek)
             val newLesson =
-                buildNewLesson(lessonNumber, locationId, teacher, isOnline, lessonType, subjectId, auditorium, weekDay)
+                buildNewLesson(lessonNumber, teacher, isOnline, lessonType, subjectId, auditorium, weekDay)
             saveNewLesson(teacher, weekDay, lessonNumber, lessonType, groupId, newLesson)
         }
         fillModelDefaultData(model, groupId)
@@ -124,7 +123,6 @@ class ScheduleEditController {
 
     private fun buildNewLesson(
         lessonNumber: Int,
-        locationId: Int,
         teacher: Teacher,
         isOnline: Boolean?,
         lessonType: LessonType,
@@ -134,7 +132,6 @@ class ScheduleEditController {
     ): LessonSchedule {
         val newLesson = LessonSchedule()
         newLesson.lessonNumber = lessonNumber
-        newLesson.lessonLocation = lessonLocationRepository.findById(locationId).get()
 
         newLesson.teacher = teacher
         newLesson.online = isOnline ?: false //по умолчанию приходит null
@@ -158,12 +155,12 @@ class ScheduleEditController {
     }
 }
 
-data class PairInfo(val busyTeachers: List<Int>, val busyAuditoriums: List<Int>)
+data class PairInfo(val busyTeachers: List<Int>, val busyAuditoriums: List<String>)
 data class LessonItem(
     val name: String,
     val regularity: LessonType,
     val teacher: String,
-    val auditorium: Int,
+    val auditorium: String,
     val isOnline: Boolean,
     val location: String,
 ) {
@@ -171,7 +168,7 @@ data class LessonItem(
         name = it.subject.subjectName,
         auditorium = it.auditorium.auditoriumNumber,
         isOnline = it.online,
-        location = it.lessonLocation.lessonLocation,
+        location = it.auditorium.lessonLocation.lessonLocation,
         regularity = it.lessonType,
         teacher = getTeacherFullName(it.teacher)
     )
