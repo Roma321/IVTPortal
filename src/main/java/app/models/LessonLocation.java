@@ -28,7 +28,7 @@ public class LessonLocation implements Serializable {
     @Column(name = "lesson_location_id")
     private Integer lessonLocationId;
 
-    @Column(name = "lesson_location", length = 64, unique = true)
+    @Column(name = "lesson_location", length = 128, unique = true)
     private String lessonLocation;
 
     public Integer getLessonLocationId() {

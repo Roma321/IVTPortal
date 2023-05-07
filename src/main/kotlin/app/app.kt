@@ -9,8 +9,4 @@ class BlogApplication
 
 fun main(args: Array<String>) {
     runApplication<BlogApplication>(*args)
-//    println("test")
-//    val c = MyClass(3, 5)
-//    println(c.sum)
-
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping
 
 @Controller
 class Title {
+
     @GetMapping("/")
     fun title(model: Model): String{
         return "title"
