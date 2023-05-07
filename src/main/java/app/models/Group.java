@@ -3,9 +3,11 @@ package app.models;
 import app.models.enums.GroupType;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "\"Group\"")
-public class Group {
+public class Group implements Serializable {
 
     public Group(Integer id) {
         groupId = id;

@@ -83,3 +83,13 @@ private fun getFreePairs(
     }
     return groupedByLessonNumber
 }
+
+fun groupBusynessWithKeyExtract(list: List<LessonSchedule>, extractParam: (LessonSchedule) -> Any?) =
+    list.groupBy { extractParam(it) }
+        .mapValues { auditoriumList ->
+            auditoriumList.value.groupBy { it.weekDay }
+                .mapValues { weekDayListEntry ->
+                    weekDayListEntry.value.groupBy { it.lessonNumber }
+                        .mapValues { lessonListEntry -> lessonListEntry.value.map { it.lessonType } }
+                }
+        }

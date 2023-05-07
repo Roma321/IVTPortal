@@ -2,9 +2,11 @@ package app.models;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table
-public class LessonLocation {
+public class LessonLocation implements Serializable {
 
     public LessonLocation() {}
 

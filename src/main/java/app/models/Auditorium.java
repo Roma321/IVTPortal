@@ -3,9 +3,11 @@ package app.models;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.io.Serializable;
+
 @Entity
 @Table
-public class Auditorium {
+public class Auditorium implements Serializable {
 
     public Auditorium() {}
 

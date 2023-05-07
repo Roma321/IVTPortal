@@ -5,12 +5,13 @@ import app.models.enums.WeekDay;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
+import java.io.*;
 import java.sql.Date;
 import java.util.List;
 
 @Entity
 @Table
-public class LessonSchedule {
+public class LessonSchedule implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lesson_id")
@@ -154,5 +155,19 @@ public class LessonSchedule {
                 ", auditorium=" + auditorium +
                 ", groups=" + groups +
                 '}';
+    }
+
+    public LessonSchedule deepCopy() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (LessonSchedule) ois.readObject();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create deep copy", e);
+        }
     }
 }

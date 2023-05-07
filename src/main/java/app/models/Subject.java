@@ -2,9 +2,11 @@ package app.models;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table
-public class Subject {
+public class Subject implements Serializable {
 
     public Subject() {}
 
