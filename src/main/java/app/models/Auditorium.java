@@ -60,4 +60,14 @@ public class Auditorium implements Serializable {
     public void setLessonLocation(LessonLocation lessonLocation) {
         this.lessonLocation = lessonLocation;
     }
+
+    @Override
+    public String toString() {
+        return "Auditorium{" +
+                "auditoriumNumber='" + auditoriumNumber + '\'' +
+                ", placeAmount=" + placeAmount +
+                ", computerAmount=" + computerAmount +
+                ", lessonLocation=" + lessonLocation +
+                '}';
+    }
 }

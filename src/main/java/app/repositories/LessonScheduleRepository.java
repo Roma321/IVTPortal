@@ -17,4 +17,5 @@ public interface LessonScheduleRepository extends CrudRepository<LessonSchedule,
 
 
     List<LessonSchedule> findLessonSchedulesByGroupsGroupId(int group);
+    List<LessonSchedule> findByAuditoriumAuditoriumNumber(String auditoriumNumber);
 }

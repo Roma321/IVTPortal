@@ -84,12 +84,24 @@ private fun getFreePairs(
     return groupedByLessonNumber
 }
 
-fun groupBusynessWithKeyExtract(list: List<LessonSchedule>, extractParam: (LessonSchedule) -> Any?) =
-    list.groupBy { extractParam(it) }
+fun groupBusynessWithKeyExtract(
+    list: List<LessonSchedule>,
+    allKeys: List<Any>,
+    extractParam: (LessonSchedule) -> Any?
+): Map<Any?, Map<WeekDay, Map<Int, List<LessonType>>>> {
+
+    val a = list.groupBy { extractParam(it) }
         .mapValues { auditoriumList ->
             auditoriumList.value.groupBy { it.weekDay }
                 .mapValues { weekDayListEntry ->
                     weekDayListEntry.value.groupBy { it.lessonNumber }
                         .mapValues { lessonListEntry -> lessonListEntry.value.map { it.lessonType } }
                 }
+        }.toMutableMap()
+    for (id in allKeys) {
+        if (id !in a.keys) {
+            a[id] = mapOf()
         }
+    }
+    return a
+}

@@ -1,8 +1,7 @@
-{{> header}}
 <table border="1" id="table">
 
 </table>
-{{> footer}}
+
 <script>
     items = JSON.parse("{{items}}".replaceAll("&quot;", '"'))
     table = document.getElementById('table')
@@ -108,5 +107,6 @@
             table.append(lowerTr)
         }
     }
+
 
 </script>

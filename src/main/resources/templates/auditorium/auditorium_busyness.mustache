@@ -1,0 +1,16 @@
+{{> header}}
+<h2>Занятость аудиторий</h2>
+<form method="post">
+    Перераспределить все пары из аудитории №:
+    <select name="auditorium">
+        {{# auditoriums}}
+            <option value={{.}}>{{.}}</option>
+        {{/auditoriums}}
+    </select>
+    <div>
+        <button type="submit">Перераспределить</button>
+    </div>
+    <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+</form>
+{{>busyness_table}}
+{{> footer}}
